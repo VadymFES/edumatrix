@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # PostgreSQL для користувачів і авторизації
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: edumatrix
+      POSTGRES_PASSWORD: edumatrix
+      POSTGRES_DB: edumatrix
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/postgres/data:/var/lib/postgresql/data
+      - ./db/postgres/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edumatrix"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Neo4j для графа знань
+  neo4j:
+    image: neo4j:4.4
+    environment:
+      NEO4J_AUTH: neo4j/edumatrix
+      NEO4J_dbms_memory_heap_initial__size: 512m
+      NEO4J_dbms_memory_heap_max__size: 1G
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    volumes:
+      - ./db/neo4j/data:/data
+      - ./db/neo4j/logs:/logs
+      - ./db/neo4j/import:/import
+      - ./db/neo4j/init:/init
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:7474"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB для даних навчання
+  mongodb:
+    image: mongo:5.0
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: edumatrix
+      MONGO_INITDB_ROOT_PASSWORD: edumatrix
+      MONGO_INITDB_DATABASE: edumatrix
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./db/mongodb/data:/data/db
+      - ./db/mongodb/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend сервіс
+  backend:
+    build: ./backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://edumatrix:edumatrix@postgres/edumatrix
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=edumatrix
+      - MONGODB_URL=mongodb://edumatrix:edumatrix@mongodb:27017
+      - SECRET_KEY=your-secret-key-for-jwt
+    depends_on:
+      - postgres
+      - neo4j
+      - mongodb
+
+  # Frontend сервіс
+  frontend:
+    build: ./frontend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8000
+    depends_on:
+      - backend

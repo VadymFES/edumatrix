@@ -1,0 +1,55 @@
+# Node.js / React
+node_modules/
+npm-debug.log
+yarn-error.log
+/dist
+/build
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-log.txt
+pip-delete-this-directory.txt
+
+# VSCode
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# IntelliJ
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# Docker
+*.env
+docker-compose.override.yml
+
+# General
+*.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.bak
+
+# Project specific
+frontend/build/¬
+backend/__pycache__/
+db/postgres/data/
+db/neo4j/data/
+db/mongodb/data/

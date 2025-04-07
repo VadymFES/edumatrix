@@ -1,0 +1,32 @@
+[project]
+name = "edumatrix-backend"
+version = "0.1.0"
+description = "EduMatrix Adaptive Learning System Backend"
+authors = [
+    {name = "Vadym"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi (>=0.115.12,<0.116.0)",
+    "uvicorn (>=0.34.0,<0.35.0)",
+    "pydantic (>=2.11.2,<3.0.0)",
+    "sqlalchemy (>=2.0.40,<3.0.0)",
+    "py2neo (>=2021.2.4,<2022.0.0)",
+    "motor (>=3.7.0,<4.0.0)",
+    "passlib (>=1.7.4,<2.0.0)",
+    "python-jose[cryptography] (>=3.4.0,<4.0.0)",
+    "python-multipart (>=0.0.20,<0.0.21)",
+    "pytest (>=8.3.5,<9.0.0)",
+    "pytest-asyncio (>=0.26.0,<0.27.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.group.dev.dependencies]
+black = "^25.1.0"
+mypy = "^1.15.0"
+
